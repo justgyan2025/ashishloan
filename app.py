@@ -343,8 +343,7 @@ def update_sheet_data(range_name, values):
 
 
 def delete_row(sheet_name, row_index):
-    range_name = f'{sheet_name}!{chr(65 + len(get_sheet_data(f"{sheet_name}!A1:A")) - 1)}{
-        row_index}:{chr(65 + len(get_sheet_data(f"{sheet_name}!A1:A")) - 1)}{row_index}'
+    range_name = f'{sheet_name}!A{row_index}:{chr(65 + len(get_sheet_data(f"{sheet_name}!A1:A")) - 1)}{row_index}'
     result = sheet.values().clear(
         spreadsheetId=SPREADSHEET_ID,
         range=range_name,
