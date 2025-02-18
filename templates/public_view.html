@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Details - {{ borrower[0] }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <style>
+        .table-toggle-btn {
+            @apply flex items-center justify-between w-full px-4 py-2 text-left text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg focus:outline-none;
+        }
+        
+        .table-section {
+            @apply overflow-hidden transition-all duration-300 ease-in-out;
+        }
+        
+        @media (max-width: 768px) {
+            .table-scroll {
+                @apply overflow-x-auto -mx-6 px-6;
+            }
+        }
+        
+        .gradient-card {
+            @apply bg-gradient-to-br from-white to-gray-50 border border-gray-200;
+        }
+        
+        .stat-card {
+            @apply bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100;
+        }
+        
+        .progress-bar {
+            @apply bg-gradient-to-r from-blue-400 to-blue-600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Borrower Info Card -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8 border border-gray-200 transform transition-all hover:shadow-xl">
+            <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-white">Borrower Details</h1>
+                </div>
+            </div>
+            <div class="p-6 gradient-card">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-sm text-gray-500">Name</p>
+                            <p class="text-lg font-semibold text-gray-900">{{ borrower[0] }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Address</p>
+                            <p class="text-lg font-semibold text-gray-900">{{ borrower[1] }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Loans Section -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8 border border-gray-200">
+            <div class="px-6 py-4 bg-gradient-to-r from-emerald-500 to-green-600">
+                <h2 class="text-xl font-semibold text-white">Active Loans</h2>
+            </div>
+            <div class="p-6 gradient-card">
+                {% for loan in loans %}
+                <div class="mb-8 last:mb-0">
+                    <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
+                        <!-- Loan Header -->
+                        <div class="flex flex-wrap justify-between items-center mb-4">
+                            <div class="mb-2 md:mb-0">
+                                <span class="text-2xl font-bold text-gray-900">₹{{ "%.2f"|format(loan[1]|float) }}</span>
+                                <span class="px-3 py-1 ml-3 text-sm font-semibold rounded-full 
+                                    {% if loan[6] == 'Active' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ loan[6] }}
+                                </span>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                Started on: <span class="font-medium">{{ loan[3] }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Loan Progress -->
+                        <div class="mb-4">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-sm font-medium text-gray-700">Loan Progress</span>
+                                <span class="text-sm text-gray-600">{{ "%.1f"|format(loan_progress[loop.index0]) }}% completed</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="progress-bar h-2.5 rounded-full" 
+                                     style="width: {{ loan_progress[loop.index0] }}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Loan Details Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <div class="p-3 bg-gray-50 rounded-lg">
+                                <p class="text-sm text-gray-500">Interest Rate</p>
+                                <p class="text-lg font-semibold text-gray-900">{{ "%.2f"|format(loan[2]|float) }}%</p>
+                            </div>
+                            <div class="p-3 bg-gray-50 rounded-lg">
+                                <p class="text-sm text-gray-500">Tenure</p>
+                                <p class="text-lg font-semibold text-gray-900">{{ loan[4] }} months</p>
+                            </div>
+                            <div class="p-3 bg-gray-50 rounded-lg">
+                                <p class="text-sm text-gray-500">Monthly EMI</p>
+                                <p class="text-lg font-semibold text-gray-900">₹{{ "%.2f"|format(loan[5]|float) }}</p>
+                            </div>
+                            <div class="p-3 bg-gray-50 rounded-lg">
+                                <p class="text-sm text-gray-500">Total Interest</p>
+                                <p class="text-lg font-semibold text-gray-900">₹{{ "%.2f"|format((loan[5]|float * loan[4]|float) - loan[1]|float) }}</p>
+                            </div>
+                        </div>
+
+                        <!-- EMI Breakdown -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="stat-card bg-blue-50">
+                                <p class="text-sm text-blue-600 font-medium">Monthly Principal</p>
+                                <p class="text-lg font-semibold text-gray-900">₹{{ "%.2f"|format(loan[1]|float / loan[4]|float) }}</p>
+                            </div>
+                            <div class="stat-card bg-green-50">
+                                <p class="text-sm text-green-600 font-medium">Monthly Interest</p>
+                                <p class="text-lg font-semibold text-gray-900">₹{{ "%.2f"|format((loan[1]|float * (loan[2]|float / 100)) / 12) }}</p>
+                            </div>
+                            <div class="stat-card bg-purple-50">
+                                <p class="text-sm text-purple-600 font-medium">Total Interest Payable</p>
+                                <p class="text-lg font-semibold text-gray-900">₹{{ "%.2f"|format((loan[5]|float * loan[4]|float) - loan[1]|float) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Payment History Section -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+            <div class="px-6 py-4 bg-gradient-to-r from-violet-500 to-purple-600">
+                <h2 class="text-xl font-semibold text-white">Payment History</h2>
+            </div>
+            <div class="p-6 gradient-card">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Principal</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interest</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for payment in payments %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ payment[1] }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{{ "%.2f"|format(payment[2]|float) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{{ "%.2f"|format(payment[3]|float) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{{ "%.2f"|format(payment[4]|float) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                        Paid
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script>
+    function toggleTable(tableId) {
+        const table = document.getElementById(tableId);
+        const arrow = document.getElementById(tableId === 'loansTable' ? 'loansArrow' : 'paymentsArrow');
+        
+        if (table.style.maxHeight) {
+            table.style.maxHeight = null;
+            arrow.classList.remove('rotate-180');
+        } else {
+            table.style.maxHeight = table.scrollHeight + "px";
+            arrow.classList.add('rotate-180');
+        }
+    }
+
+    // Function to handle window resize
+    function handleResize() {
+        const tables = document.querySelectorAll('.table-section');
+        tables.forEach(table => {
+            if (table.style.maxHeight) {
+                table.style.maxHeight = table.scrollHeight + "px";
+            }
+        });
+    }
+
+    // Initialize tables
+    document.addEventListener('DOMContentLoaded', function() {
+        const tables = document.querySelectorAll('.table-section');
+        tables.forEach(table => {
+            table.style.maxHeight = table.scrollHeight + "px";
+        });
+        
+        // Add resize listener
+        window.addEventListener('resize', handleResize);
+    });
+
+    // Add swipe functionality for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    });
+
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        const tableScrolls = document.querySelectorAll('.table-scroll');
+        
+        if (Math.abs(touchEndX - touchStartX) > swipeThreshold) {
+            tableScrolls.forEach(scroll => {
+                if (touchEndX < touchStartX) {
+                    // Swipe left
+                    scroll.scrollBy({ left: 100, behavior: 'smooth' });
+                } else {
+                    // Swipe right
+                    scroll.scrollBy({ left: -100, behavior: 'smooth' });
+                }
+            });
+        }
+    }
+
+    // Add horizontal scroll indicators
+    document.querySelectorAll('.table-scroll').forEach(scroll => {
+        scroll.addEventListener('scroll', () => {
+            const maxScroll = scroll.scrollWidth - scroll.clientWidth;
+            const currentScroll = scroll.scrollLeft;
+            
+            if (currentScroll === 0) {
+                scroll.classList.add('scroll-start');
+                scroll.classList.remove('scroll-middle', 'scroll-end');
+            } else if (currentScroll >= maxScroll) {
+                scroll.classList.add('scroll-end');
+                scroll.classList.remove('scroll-start', 'scroll-middle');
+            } else {
+                scroll.classList.add('scroll-middle');
+                scroll.classList.remove('scroll-start', 'scroll-end');
+            }
+        });
+    });
+    </script>
+</body>
+</html> 

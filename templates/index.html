@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Total Borrowers Card -->
+        <div class="bg-white/40 backdrop-blur-md rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 p-6 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] hover:translate-y-[-2px]">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-3 shadow-lg">
+                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-600 truncate">
+                            Total Borrowers
+                        </dt>
+                        <dd class="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                            {{ total_borrowers }}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Loans Card -->
+        <div class="bg-white/40 backdrop-blur-md rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 p-6 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] hover:translate-y-[-2px]">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-3 shadow-lg">
+                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-600 truncate">
+                            Active Loans
+                        </dt>
+                        <dd class="text-2xl font-semibold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+                            {{ active_loans }}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Loan Amount Card -->
+        <div class="bg-white/40 backdrop-blur-md rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 p-6 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] hover:translate-y-[-2px]">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-3 shadow-lg">
+                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-5 w-0 flex-1">
+                    <dl>
+                        <dt class="text-sm font-medium text-gray-600 truncate">
+                            Total Loan Amount
+                        </dt>
+                        <dd class="text-2xl font-semibold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+                            ₹{{ "{:,.2f}".format(total_loan_amount) }}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loan Progress Card -->
+    <div class="bg-white/40 backdrop-blur-md rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 p-6 transition-all duration-300">
+        <h3 class="text-lg font-medium text-gray-800 mb-4">Total Loan Progress</h3>
+        <div class="space-y-4">
+            <div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-600">Principal Paid</span>
+                    <span class="text-sm font-medium text-gray-600">₹{{ "{:,.2f}".format(total_principal_paid) }} / ₹{{ "{:,.2f}".format(total_loan_amount) }}</span>
+                </div>
+                <div class="w-full bg-gray-200/50 rounded-full h-4 backdrop-blur-sm">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full transition-all duration-500 shadow-lg" style="width: {{ total_principal_paid_percentage }}%"></div>
+                </div>
+                <div class="text-right mt-2">
+                    <span class="text-sm text-gray-500">{{ "{:.1f}".format(total_principal_paid_percentage) }}% Complete</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

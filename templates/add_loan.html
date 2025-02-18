@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Add Loan Form -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-6">Add New Loan</h2>
+        <form action="{{ url_for('add_loan') }}" method="post" class="space-y-4">
+            <div class="relative group">
+                <label for="borrower_name" class="block text-sm font-medium text-gray-700">Borrower</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <select id="borrower_name" name="borrower_name" required
+                            class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all">
+                        <option value="">Select Borrower</option>
+                        {% for borrower in borrowers %}
+                        <option value="{{ borrower[0] }}">{{ borrower[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="relative group">
+                    <label for="amount" class="block text-sm font-medium text-gray-700">Loan Amount (₹)</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">₹</span>
+                        </div>
+                        <input type="number" step="0.01" id="amount" name="amount" required
+                               class="pl-7 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+                               placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <label for="interest_rate" class="block text-sm font-medium text-gray-700">Interest Rate (%)</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="number" step="0.01" id="interest_rate" name="interest_rate" required
+                               class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+                               placeholder="0.00">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="relative group">
+                    <label for="tenure" class="block text-sm font-medium text-gray-700">Tenure (Months)</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="number" id="tenure" name="tenure" required min="1"
+                               class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+                               placeholder="Enter months">
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <input type="date" id="start_date" name="start_date" required
+                               class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg animate-button">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add Loan
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- All Loans section with simplified header -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mt-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-900">All Loans</h3>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interest Rate</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenure</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EMI</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for loan in loans %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ loan[0] }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{{ "%.2f"|format(loan[1]|float) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ "%.2f"|format(loan[2]|float) }}%</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ loan[3] }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ loan[4] }} months</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{{ "%.2f"|format(loan[5]|float) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if loan[6] == 'Active' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ loan[6] }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                                <div class="bg-blue-600 h-2.5 rounded-full" 
+                                     style="width: {{ loan_progress[loop.index0] }}%"></div>
+                            </div>
+                            <span class="text-xs text-gray-500">{{ "%.1f"|format(loan_progress[loop.index0]) }}% paid</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Add Payment</h3>
+            <form id="paymentForm" class="space-y-4">
+                <input type="hidden" id="borrower_name" name="borrower_name">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Principal Amount</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">₹</span>
+                        </div>
+                        <input type="number" step="0.01" name="principal_amount" id="principal_amount" required min="0"
+                               class="pl-7 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                               onchange="calculateTotalPayment()">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Interest Amount</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">₹</span>
+                        </div>
+                        <input type="number" step="0.01" name="interest_amount" id="interest_amount" required min="0"
+                               class="pl-7 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                               onchange="calculateTotalPayment()">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Penalty Amount</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">₹</span>
+                        </div>
+                        <input type="number" step="0.01" name="penalty_amount" id="penalty_amount" value="0" min="0"
+                               class="pl-7 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                               onchange="calculateTotalPayment()">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Payment Date</label>
+                    <input type="date" name="payment_date" id="payment_date" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Notes</label>
+                    <textarea name="notes" id="notes" rows="2"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                </div>
+
+                <!-- Total Amount Display -->
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-700">Total Payment Amount:</span>
+                        <span class="text-lg font-semibold text-indigo-600">₹<span id="total_amount">0.00</span></span>
+                    </div>
+                </div>
+
+                <!-- Error Message Display -->
+                <div id="paymentError" class="hidden mt-2 p-2 text-sm text-red-600 bg-red-50 rounded"></div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closePaymentModal()"
+                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">
+                        Cancel
+                    </button>
+                    <button type="submit" id="submitPayment"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                        Submit Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Ensure the DOM is fully loaded before adding event listeners
+window.addEventListener('DOMContentLoaded', function() {
+    // Set default date to today
+    document.getElementById('start_date').valueAsDate = new Date();
+
+    // Add event listeners for EMI calculation
+    const inputs = ['amount', 'interest_rate', 'tenure'];
+    inputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            ['input', 'change'].forEach(eventType => {
+                element.addEventListener(eventType, calculateEMI);
+            });
+        }
+    });
+});
+
+// Function to generate and show the share link
+async function generateLink() {
+    const borrowerSelect = document.getElementById('link_borrower');
+    const selectedBorrower = borrowerSelect.value;
+    const linkSection = document.getElementById('linkSection');
+    const publicViewLink = document.getElementById('publicViewLink');
+    const viewDetailsLink = document.getElementById('viewDetailsLink');
+    
+    if (!selectedBorrower) {
+        alert('Please select a borrower first');
+        return;
+    }
+    
+    try {
+        // Generate the public view URL
+        const publicUrl = `${window.location.origin}/public_view/${encodeURIComponent(selectedBorrower)}`;
+        
+        // Update the UI
+        publicViewLink.value = publicUrl;
+        viewDetailsLink.href = publicUrl;
+        linkSection.classList.remove('hidden');
+        
+        // Show success message
+        showToast('Link generated successfully!', 'green');
+    } catch (error) {
+        console.error('Error generating link:', error);
+        showToast('Error generating link. Please try again.', 'red');
+    }
+}
+
+// Function to copy the public link to clipboard
+async function copyPublicLink() {
+    const linkInput = document.getElementById('publicViewLink');
+    
+    if (!linkInput.value) {
+        showToast('Please generate a link first', 'red');
+        return;
+    }
+    
+    try {
+        await navigator.clipboard.writeText(linkInput.value);
+        showToast('Link copied to clipboard!', 'green');
+    } catch (err) {
+        console.error('Failed to copy link:', err);
+        showToast('Failed to copy link. Please try again.', 'red');
+    }
+}
+
+// Function to show toast notifications
+function showToast(message, color = 'green') {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-4 right-4 bg-${color}-500 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 flex items-center z-50`;
+    toast.innerHTML = `
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        ${message}
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+
+// Add input validation for numeric fields
+document.querySelectorAll('input[type="number"]').forEach(input => {
+    input.addEventListener('input', function() {
+        // Prevent negative values
+        if (this.value < 0) this.value = 0;
+    });
+});
+
+// Update link section visibility when borrower is selected
+document.getElementById('link_borrower').addEventListener('change', function() {
+    const linkSection = document.getElementById('linkSection');
+    if (this.value) {
+        generateLink();
+    } else {
+        linkSection.classList.add('hidden');
+    }
+});
+
+// Highlight the entire link when clicked
+document.getElementById('publicViewLink').addEventListener('click', function() {
+    this.select();
+});
+
+// Payment modal functions
+function openPaymentModal(borrowerName, emiAmount) {
+    const modal = document.getElementById('paymentModal');
+    if (!modal) return;
+
+    // Set borrower name
+    document.getElementById('borrower_name').value = borrowerName;
+
+    // Calculate and set principal (80%) and interest (20%) amounts
+    const emi = parseFloat(emiAmount);
+    const principalAmount = emi * 0.8;
+    const interestAmount = emi * 0.2;
+
+    document.getElementById('principal_amount').value = principalAmount.toFixed(2);
+    document.getElementById('interest_amount').value = interestAmount.toFixed(2);
+    document.getElementById('penalty_amount').value = '0.00';
+
+    // Set today's date
+    document.getElementById('payment_date').valueAsDate = new Date();
+
+    // Calculate total
+    calculateTotalPayment();
+
+    // Show modal
+    modal.classList.remove('hidden');
+}
+
+function closePaymentModal() {
+    const modal = document.getElementById('paymentModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.getElementById('paymentForm').reset();
+        document.getElementById('paymentError').classList.add('hidden');
+    }
+}
+
+function calculateTotalPayment() {
+    const principal = parseFloat(document.getElementById('principal_amount').value) || 0;
+    const interest = parseFloat(document.getElementById('interest_amount').value) || 0;
+    const penalty = parseFloat(document.getElementById('penalty_amount').value) || 0;
+    const total = principal + interest + penalty;
+    document.getElementById('total_amount').textContent = total.toFixed(2);
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('paymentModal');
+    if (event.target === modal) {
+        closePaymentModal();
+    }
+};
+
+function validatePaymentForm() {
+    const principal = parseFloat(document.getElementById('principal_amount').value) || 0;
+    const interest = parseFloat(document.getElementById('interest_amount').value) || 0;
+    const penalty = parseFloat(document.getElementById('penalty_amount').value) || 0;
+    const date = document.getElementById('payment_date').value;
+    const borrower = document.getElementById('borrower_name').value;
+
+    if (!borrower) {
+        document.getElementById('paymentError').textContent = 'Borrower name is required';
+        document.getElementById('paymentError').classList.remove('hidden');
+        return false;
+    }
+
+    if (principal <= 0 && interest <= 0 && penalty <= 0) {
+        document.getElementById('paymentError').textContent = 'At least one payment amount must be greater than 0';
+        document.getElementById('paymentError').classList.remove('hidden');
+        return false;
+    }
+
+    if (!date) {
+        document.getElementById('paymentError').textContent = 'Payment date is required';
+        document.getElementById('paymentError').classList.remove('hidden');
+        return false;
+    }
+
+    return true;
+}
+
+document.getElementById('paymentForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    if (!validatePaymentForm()) {
+        return false;
+    }
+
+    const submitButton = document.getElementById('submitPayment');
+    const errorDiv = document.getElementById('paymentError');
+    
+    try {
+        // Disable submit button and show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML = 'Submitting...';
+        errorDiv.classList.add('hidden');
+
+        const formData = new FormData(this);
+        
+        const response = await fetch("{{ url_for('add_payment') }}", {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Payment added successfully');
+            closePaymentModal();
+            window.location.reload();
+        } else {
+            errorDiv.textContent = result.message || 'Failed to add payment';
+            errorDiv.classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        errorDiv.textContent = 'An error occurred while submitting the payment';
+        errorDiv.classList.remove('hidden');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Submit Payment';
+    }
+});
+</script>
+{% endblock %} 

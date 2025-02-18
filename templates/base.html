@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashish Loan Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafc;
+            background-image: radial-gradient(at 40% 20%, rgba(61, 65, 251, 0.05) 0px, transparent 50%),
+                            radial-gradient(at 80% 0%, rgba(236, 72, 153, 0.05) 0px, transparent 50%),
+                            radial-gradient(at 0% 50%, rgba(37, 99, 235, 0.05) 0px, transparent 50%);
+            min-height: 100vh;
+        }
+        .animate-button {
+            transition: all 0.3s ease;
+        }
+        .animate-button:hover {
+            transform: translateY(-2px);
+        }
+        .neo-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        }
+        .neo-button {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .neo-button:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        .mobile-menu {
+            animation: slideIn 0.3s ease-out;
+        }
+        .profile-name {
+            background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+        .nav-gradient {
+            background: linear-gradient(135deg, #4338ca, #6d28d9, #7c3aed);
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #e0e7ff;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .profile-glow {
+            box-shadow: 0 0 15px rgba(199, 210, 254, 0.5);
+        }
+        .nav-button {
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(199, 210, 254, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(199, 210, 254, 0.7);
+            }
+        }
+        .logout-button-glow:hover {
+            animation: glow 2s infinite;
+        }
+        .nav-spacing {
+            margin-right: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .nav-spacing {
+                margin-right: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Enhanced Navigation Bar -->
+    <nav class="nav-gradient shadow-lg sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <!-- Logo with enhanced styling -->
+                    <div class="flex-shrink-0">
+                        <a href="{{ url_for('index') }}" class="flex items-center space-x-4 group">
+                            <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-indigo-200 profile-glow transition-all duration-300 transform group-hover:scale-105">
+                                <img src="{{ url_for('static', filename='images/profile.png') }}" 
+                                     alt="Profile" 
+                                     class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-2xl font-bold text-white tracking-tight">
+                                    Ashish
+                                </span>
+                                <span class="text-sm text-indigo-200 font-medium">
+                                    Finance Management
+                                </span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Enhanced Desktop Navigation Links -->
+                    <div class="hidden md:ml-10 md:flex md:space-x-8">
+                        <a href="{{ url_for('index') }}" 
+                           class="nav-link text-white hover:text-indigo-200 px-3 py-2 text-sm font-medium uppercase tracking-wider flex items-center space-x-2
+                           {% if request.endpoint == 'index' %}border-b-2 border-indigo-200{% endif %}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            <span>Home</span>
+                        </a>
+                        <a href="{{ url_for('add_borrower') }}"
+                           class="nav-link text-white hover:text-indigo-200 px-3 py-2 text-sm font-medium uppercase tracking-wider flex items-center space-x-2
+                           {% if request.endpoint == 'add_borrower' %}border-b-2 border-indigo-200{% endif %}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                            <span>Borrowers</span>
+                        </a>
+                        <a href="{{ url_for('add_loan') }}"
+                           class="nav-link text-white hover:text-indigo-200 px-3 py-2 text-sm font-medium uppercase tracking-wider flex items-center space-x-2
+                           {% if request.endpoint == 'add_loan' %}border-b-2 border-indigo-200{% endif %}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Add Loan</span>
+                        </a>
+                        <a href="{{ url_for('add_payment') }}"
+                           class="nav-link text-white hover:text-indigo-200 px-3 py-2 text-sm font-medium uppercase tracking-wider flex items-center space-x-2
+                           {% if request.endpoint == 'add_payment' %}border-b-2 border-indigo-200{% endif %}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <span>Add Payment</span>
+                        </a>
+                    </div>
+
+                    <!-- Enhanced Logout Button -->
+                    <div class="hidden md:flex items-center ml-6">
+                        <a href="{{ url_for('logout') }}" 
+                           class="group relative inline-flex items-center px-6 py-2.5 text-sm font-semibold text-white 
+                                  bg-gradient-to-r from-purple-600 to-indigo-600 
+                                  rounded-lg shadow-md hover:shadow-lg
+                                  transform hover:-translate-y-0.5 transition-all duration-200
+                                  border border-indigo-200/30 hover:border-indigo-200/50">
+                            <span class="relative flex items-center space-x-2">
+                                <svg class="w-5 h-5 transform group-hover:rotate-12 transition-transform duration-200" 
+                                     fill="none" 
+                                     stroke="currentColor" 
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" 
+                                          stroke-linejoin="round" 
+                                          stroke-width="2" 
+                                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                <span class="tracking-wider">Logout</span>
+                            </span>
+                            <div class="absolute inset-0 rounded-lg bg-white/10 
+                                        opacity-0 group-hover:opacity-100 
+                                        transition-opacity duration-200">
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Enhanced Mobile Menu Button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" 
+                            onclick="toggleMobileMenu()"
+                            class="nav-button inline-flex items-center justify-center p-2 rounded-lg text-indigo-200 hover:text-white hover:bg-indigo-600/30 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Mobile Menu -->
+        <div class="hidden md:hidden" id="mobileMenu">
+            <div class="px-2 pt-2 pb-3 space-y-1 bg-indigo-700/95 backdrop-blur-md">
+                <!-- Mobile menu items with icons -->
+                <a href="{{ url_for('index') }}" 
+                   class="flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-indigo-600/50 rounded-lg transition-all duration-300
+                   {% if request.endpoint == 'index' %}bg-indigo-600/50{% endif %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span>Home</span>
+                </a>
+                <a href="{{ url_for('add_borrower') }}"
+                   class="flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-indigo-600/50 rounded-lg transition-all duration-300
+                   {% if request.endpoint == 'add_borrower' %}bg-indigo-600/50{% endif %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    <span>Borrowers</span>
+                </a>
+                <a href="{{ url_for('add_loan') }}"
+                   class="flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-indigo-600/50 rounded-lg transition-all duration-300
+                   {% if request.endpoint == 'add_loan' %}bg-indigo-600/50{% endif %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Add Loan</span>
+                </a>
+                <a href="{{ url_for('add_payment') }}"
+                   class="flex items-center space-x-2 px-3 py-2 text-base font-medium text-white hover:bg-indigo-600/50 rounded-lg transition-all duration-300
+                   {% if request.endpoint == 'add_payment' %}bg-indigo-600/50{% endif %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <span>Add Payment</span>
+                </a>
+                
+                <!-- Enhanced mobile logout button -->
+                <a href="{{ url_for('logout') }}"
+                   class="flex items-center space-x-2 px-4 py-3 mt-4 
+                          text-base font-medium text-white 
+                          bg-gradient-to-r from-purple-600/80 to-indigo-600/80
+                          rounded-lg transition-all duration-300
+                          border border-indigo-200/30
+                          hover:bg-gradient-to-r hover:from-purple-600 hover:to-indigo-600
+                          hover:border-indigo-200/50">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" 
+                              stroke-linejoin="round" 
+                              stroke-width="2" 
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="max-w-7xl mx-auto px-4 py-3 mt-4">
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">{{ message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- JavaScript for mobile menu toggle -->
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html> 

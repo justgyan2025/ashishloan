@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Add Payment Form -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+        <div class="px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600">
+            <h3 class="text-xl font-semibold text-white">Add New Payment</h3>
+        </div>
+        <div class="p-6">
+            <form method="POST" class="space-y-4" id="paymentForm">
+                <div>
+                    <label for="borrower_name" class="block text-sm font-medium text-gray-700">Borrower</label>
+                    <select id="borrower_name" name="borrower_name" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Select Borrower</option>
+                        {% for borrower in borrowers %}
+                        <option value="{{ borrower[0] }}">
+                            {{ borrower[0] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="principal_amount" class="block text-sm font-medium text-gray-700">Principal Amount (₹)</label>
+                        <input type="number" step="0.01" id="principal_amount" name="principal_amount" value="0"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="interest_amount" class="block text-sm font-medium text-gray-700">Interest Amount (₹)</label>
+                        <input type="number" step="0.01" id="interest_amount" name="interest_amount" value="0"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="penalty_amount" class="block text-sm font-medium text-gray-700">Penalty Amount (₹)</label>
+                        <input type="number" step="0.01" id="penalty_amount" name="penalty_amount" value="0"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="payment_date" class="block text-sm font-medium text-gray-700">Payment Date</label>
+                    <input type="date" id="payment_date" name="payment_date" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+                    <textarea id="notes" name="notes" rows="3"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+
+                <!-- Total Payment Preview -->
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-700">Total Payment:</span>
+                        <span class="text-lg font-semibold text-blue-600">₹<span id="totalAmount">0.00</span></span>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 animate-button">
+                        Add Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment History Section -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gradient-to-r from-purple-500 to-purple-600">
+            <h3 class="text-xl font-semibold text-white">Recent Payments</h3>
+        </div>
+        <div class="p-6">
+            {% if payments %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase tracking-wider">Principal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-green-600 uppercase tracking-wider">Interest</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-red-600 uppercase tracking-wider">Penalty</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for payment in payments %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ payment[0] }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if payment[2] %}
+                                    {% if payment[2]|string|length == 5 %}
+                                        {% set excel_date = payment[2]|int %}
+                                        {% set base_date = '1899-12-30' %}
+                                        {{ (base_date|string|to_datetime + timedelta(days=excel_date))|strftime('%d-%m-%Y') }}
+                                    {% else %}
+                                        {% set date_parts = payment[2].split('-') %}
+                                        {% if date_parts|length == 3 %}
+                                            {{ date_parts[2] }}-{{ date_parts[1] }}-{{ date_parts[0] }}
+                                        {% else %}
+                                            {{ payment[2] }}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                                ₹{{ "{:,.2f}".format(payment[3]|float) if payment[3] and payment[3] != '0.00' else '0.00' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                                ₹{{ "{:,.2f}".format(payment[4]|float) if payment[4] and payment[4] != '0.00' else '0.00' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600">
+                                ₹{{ "{:,.2f}".format(payment[5]|float) if payment[5] and payment[5] != '0.00' else '0.00' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                ₹{{ "{:,.2f}".format(payment[1]|float) if payment[1] and payment[1] != '0.00' else '0.00' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ payment[6]|default('', true) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <div class="text-gray-500">No payment history found.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+const amountInputs = ['principal_amount', 'interest_amount', 'penalty_amount'];
+
+amountInputs.forEach(id => {
+    document.getElementById(id).addEventListener('input', calculateTotal);
+});
+
+function calculateTotal() {
+    const total = amountInputs.reduce((sum, id) => {
+        return sum + (parseFloat(document.getElementById(id).value) || 0);
+    }, 0);
+    document.getElementById('totalAmount').textContent = total.toFixed(2);
+}
+
+// Set default date to today
+document.getElementById('payment_date').valueAsDate = new Date();
+
+// Add form submission handler
+document.getElementById('paymentForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitButton = this.querySelector('button[type="submit"]');
+    
+    try {
+        submitButton.disabled = true;
+        submitButton.innerHTML = 'Submitting...';
+        
+        const response = await fetch("{{ url_for('add_payment') }}", {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Payment added successfully');
+            window.location.reload();
+        } else {
+            alert(result.message || 'Failed to add payment');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the payment');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Add Payment';
+    }
+});
+</script>
+{% endblock %} 
