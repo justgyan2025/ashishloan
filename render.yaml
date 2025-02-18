@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: loan-management-app
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.0
+      - key: FLASK_SECRET_KEY
+        sync: false
+      - key: GOOGLE_SHEET_ID
+        sync: false 
