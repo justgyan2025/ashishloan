@@ -909,7 +909,7 @@ def calculate_emi_route():
 def public_view(borrower_name):
     try:
         # Get borrower details
-        borrowers = get_sheet_data('Borrowers!A2:D')
+        borrowers = get_sheet_data('Borrowers!A2:C')
         borrower = None
         for b in borrowers:
             if b[0] == borrower_name:
@@ -925,25 +925,34 @@ def public_view(borrower_name):
         borrower_loans = [loan for loan in loans if loan[0] == borrower_name]
 
         # Get payments for this borrower
-        payments = get_sheet_data('Payments!A2:G')
+        payments = get_sheet_data('Payments!A2:G')  # Changed to include all columns
         borrower_payments = [payment for payment in payments if payment[0] == borrower_name]
 
-        # Calculate loan progress
+        # Calculate loan progress for each loan
         loan_progress = []
         for loan in borrower_loans:
-            if loan[6] == 'Active':
-                loan_payments = [p for p in borrower_payments if p[0] == borrower_name]
-                total_paid = sum(float(p[3]) for p in loan_payments)  # Sum of principal payments
-                progress = min(100, (total_paid / float(loan[1])) * 100)
-                loan_progress.append(round(progress, 2))
-            else:
-                loan_progress.append(100)
+            try:
+                loan_payments = [p for p in borrower_payments]
+                total_paid = sum(float(p[1]) for p in loan_payments if p[1])  # Use total amount paid
+                loan_amount = float(loan[1]) if loan[1] else 0
+                progress = (total_paid / loan_amount * 100) if loan_amount > 0 else 0
+                loan_progress.append(min(100, round(progress, 2)))
+            except (ValueError, TypeError, ZeroDivisionError) as e:
+                print(f"Error calculating loan progress: {str(e)}")
+                loan_progress.append(0)
+
+        # Sort payments by date in descending order
+        if borrower_payments:
+            try:
+                borrower_payments.sort(key=lambda x: datetime.strptime(str(x[2]), '%Y-%m-%d'), reverse=True)
+            except Exception as e:
+                print(f"Error sorting payments: {str(e)}")
 
         return render_template('public_view.html',
-                             borrower=borrower,
-                             loans=borrower_loans,
-                             payments=borrower_payments,
-                             loan_progress=loan_progress)
+                            borrower=borrower,
+                            loans=borrower_loans,
+                            payments=borrower_payments,
+                            loan_progress=loan_progress)
 
     except Exception as e:
         print(f"Error in public_view: {str(e)}")
