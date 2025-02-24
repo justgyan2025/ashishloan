@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashish Loan Management</title>
+    
+    <!-- Load CSS Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Base Styles -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #3B82F6, #1D4ED8);
+            --success-gradient: linear-gradient(135deg, #22c55e, #16a34a);
+            --warning-gradient: linear-gradient(135deg, #eab308, #ca8a04);
+            --danger-gradient: linear-gradient(135deg, #ef4444, #dc2626);
+            --neutral-gradient: linear-gradient(135deg, #6b7280, #4b5563);
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .gradient-text {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar {
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .profile-image {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link {
+            position: relative;
+            padding: 0.5rem;
+            color: #4B5563;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #2563EB;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            position: absolute;
+            top: 100%;
+            right: 1rem;
+            width: calc(100% - 2rem);
+            max-width: 20rem;
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .mobile-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: #4B5563;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-nav-link:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563EB;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+
+            .mobile-menu-button {
+                display: block;
+            }
+        }
+
+        .stats-card {
+            @apply bg-white rounded-xl shadow-lg p-6 transition-all duration-300;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .stats-card:hover {
+            @apply transform -translate-y-1 shadow-xl;
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .chart-container {
+            @apply bg-white rounded-xl shadow-lg p-6 mb-8;
+            min-height: 300px;
+            position: relative;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .chart-container:hover {
+            border-color: rgba(59, 130, 246, 0.2);
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+        }
+
+        .status-badge {
+            @apply px-4 py-2 rounded-full text-sm font-medium inline-flex items-center gap-2;
+            transition: all 0.3s ease;
+        }
+
+        .status-badge:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-badge.active {
+            background: var(--success-gradient);
+            @apply text-white;
+        }
+
+        .status-badge.pending {
+            background: var(--warning-gradient);
+            @apply text-white;
+        }
+
+        .status-badge.default {
+            background: var(--danger-gradient);
+            @apply text-white;
+        }
+
+        .status-badge.completed {
+            background: var(--neutral-gradient);
+            @apply text-white;
+        }
+
+        .progress-bar {
+            @apply h-2 rounded-full overflow-hidden bg-gray-100 relative;
+        }
+
+        .progress-bar-fill {
+            @apply absolute top-0 left-0 h-full transition-all duration-1000;
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Table Toggle Styles */
+        .table-view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .toggle-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            color: #4B5563;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toggle-button.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .card-view {
+            display: none;
+        }
+
+        .card-view.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .table-view {
+                display: none;
+            }
+
+            .card-view {
+                display: grid;
+            }
+        }
+    </style>
+
+    <!-- Page specific styles -->
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% block navbar %}
+    <nav class="navbar fixed w-full top-0 z-50 px-4 py-3 backdrop-blur-lg bg-white/80">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="{{ url_for('index') }}" class="navbar-brand group">
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-200"></div>
+                        <img src="{{ url_for('static', filename='profile.png') }}" class="profile-image relative">
+                    </div>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 font-bold text-xl">Ashish</span>
+                </div>
+            </a>
+
+            {% if session.get('logged_in') %}
+            <!-- Desktop Menu -->
+            <div class="desktop-menu hidden md:flex items-center space-x-6">
+                <a href="{{ url_for('add_borrower') }}" class="nav-link group">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        Add Borrower
+                    </span>
+                </a>
+                <a href="{{ url_for('add_loan') }}" class="nav-link group">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Add Loan
+                    </span>
+                </a>
+                <a href="{{ url_for('add_payment') }}" class="nav-link group">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        Add Payment
+                    </span>
+                </a>
+                <a href="{{ url_for('logout') }}" 
+                   class="relative inline-flex items-center justify-center px-6 py-2 overflow-hidden font-medium transition-all bg-red-500 rounded-lg hover:bg-red-600 group">
+                    <span class="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-red-600 group-hover:translate-x-0 ease">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                    </span>
+                    <span class="absolute flex items-center justify-center w-full h-full text-white transition-all duration-300 transform group-hover:translate-x-full ease">Logout</span>
+                    <span class="relative invisible">Logout</span>
+                </a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="mobile-menu-button md:hidden focus:outline-none" onclick="toggleMobileMenu()">
+                <div class="relative">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-200"></div>
+                    <svg class="relative w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+                    </svg>
+                </div>
+            </button>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden">
+                <div class="flex flex-col space-y-4">
+                    <a href="{{ url_for('add_borrower') }}" class="mobile-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        Add Borrower
+                    </a>
+                    <a href="{{ url_for('add_loan') }}" class="mobile-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Add Loan
+                    </a>
+                    <a href="{{ url_for('add_payment') }}" class="mobile-nav-link">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        Add Payment
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="mobile-nav-link bg-red-500 text-white hover:bg-red-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Logout
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Spacer for fixed navbar -->
+    <div class="h-20"></div>
+    {% endblock %}
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for message in messages %}
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 rounded-lg shadow-md" role="alert">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <main class="py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Load JavaScript Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Initialize AOS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                once: true
+            });
+        });
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuButton = document.querySelector('.mobile-menu-button');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Handle scroll behavior for navbar
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            const currentScroll = window.pageYOffset;
+
+            if (currentScroll <= 0) {
+                navbar.style.boxShadow = 'none';
+            } else {
+                navbar.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+            }
+
+            lastScroll = currentScroll;
+        });
+    </script>
+
+    <!-- Page specific scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+</html> 

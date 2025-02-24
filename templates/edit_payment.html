@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto p-4">
+    <!-- Edit Payment Form -->
+    <div class="bg-white rounded-2xl shadow-[0_0_25px_rgba(59,130,246,0.2)] overflow-hidden mb-8 border border-blue-100">
+        <div class="px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 border-b">
+            <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Edit Payment
+            </h3>
+        </div>
+        <div class="p-6 bg-gradient-to-b from-white to-blue-50">
+            <form method="POST" class="space-y-6" id="editPaymentForm">
+                <!-- Borrower Selection -->
+                <div class="group">
+                    <label for="borrower_name" class="block text-sm font-semibold text-blue-700 mb-2">Borrower</label>
+                    <input type="text" id="borrower_name" name="borrower_name" value="{{ payment[1] }}" readonly
+                           class="w-full bg-gray-100 text-gray-700 border-2 border-blue-100 rounded-xl px-4 py-3 
+                                  focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                  hover:border-blue-200 cursor-not-allowed">
+                </div>
+
+                <!-- Amount Fields -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="group">
+                        <label for="principal_amount" class="block text-sm font-semibold text-blue-700 mb-2">Principal (₹)</label>
+                        <div class="relative">
+                            <input type="number" step="0.01" id="principal_amount" name="principal_amount" value="{{ payment[4] }}"
+                                   class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl px-4 py-3 
+                                          focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                          hover:border-blue-200">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-blue-400">₹</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label for="interest_amount" class="block text-sm font-semibold text-blue-700 mb-2">Interest (₹)</label>
+                        <div class="relative">
+                            <input type="number" step="0.01" id="interest_amount" name="interest_amount" value="{{ payment[5] }}"
+                                   class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl px-4 py-3 
+                                          focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                          hover:border-blue-200">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-green-400">₹</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label for="penalty_amount" class="block text-sm font-semibold text-blue-700 mb-2">Penalty (₹)</label>
+                        <div class="relative">
+                            <input type="number" step="0.01" id="penalty_amount" name="penalty_amount" value="{{ payment[6] }}"
+                                   class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl px-4 py-3 
+                                          focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                          hover:border-blue-200">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-red-400">₹</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date Field -->
+                <div class="group">
+                    <label for="payment_date" class="block text-sm font-semibold text-blue-700 mb-2">Payment Date</label>
+                    <div class="relative">
+                        <input type="date" id="payment_date" name="payment_date" required
+                               class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl pl-10 pr-4 py-3 
+                                      focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                      hover:border-blue-200">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Field -->
+                <div class="group">
+                    <label for="notes" class="block text-sm font-semibold text-blue-700 mb-2">Notes</label>
+                    <textarea id="notes" name="notes" rows="3"
+                            class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl px-4 py-3 
+                                   focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                   hover:border-blue-200">{{ payment[7] }}</textarea>
+                </div>
+
+                <!-- Total Payment Preview -->
+                <div class="p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200 
+                            shadow-lg transform hover:scale-[1.02] transition-all duration-300">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-semibold text-blue-700">Total Payment:</span>
+                        <span class="text-3xl font-bold text-blue-600 payment-glow">₹<span id="totalAmount">{{ payment[2] }}</span></span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-8 flex gap-4">
+                    <button type="submit"
+                            class="flex-1 py-4 px-6 rounded-xl text-base font-semibold text-white 
+                                   bg-gradient-to-r from-blue-500 to-blue-600 
+                                   hover:from-blue-600 hover:to-blue-700
+                                   focus:outline-none focus:ring-4 focus:ring-blue-100 
+                                   transform transition-all duration-200 hover:scale-[1.02] 
+                                   shadow-[0_10px_20px_rgba(59,130,246,0.2)]
+                                   hover:shadow-[0_15px_30px_rgba(59,130,246,0.3)]">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Save Changes
+                        </span>
+                    </button>
+                    <a href="{{ url_for('add_payment') }}"
+                       class="flex-1 py-4 px-6 rounded-xl text-base font-semibold text-gray-700 
+                              bg-gray-100 hover:bg-gray-200
+                              focus:outline-none focus:ring-4 focus:ring-gray-100 
+                              transform transition-all duration-200 hover:scale-[1.02] 
+                              shadow-[0_10px_20px_rgba(0,0,0,0.1)]
+                              hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)]
+                              text-center">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            Cancel
+                        </span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.payment-glow {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Date picker styles */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background-image: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    cursor: pointer;
+    opacity: 0;
+}
+</style>
+
+<script>
+const amountInputs = ['principal_amount', 'interest_amount', 'penalty_amount'];
+
+// Store original values
+const originalValues = {
+    borrower: '{{ payment[1] }}',
+    principal: parseFloat('{{ payment[4] }}') || 0,
+    interest: parseFloat('{{ payment[5] }}') || 0,
+    penalty: parseFloat('{{ payment[6] }}') || 0,
+    date: '{{ payment[3] }}',
+    notes: '{{ payment[7] }}'
+};
+
+amountInputs.forEach(id => {
+    document.getElementById(id).addEventListener('input', calculateTotal);
+});
+
+function calculateTotal() {
+    const total = amountInputs.reduce((sum, id) => {
+        return sum + (parseFloat(document.getElementById(id).value) || 0);
+    }, 0);
+    document.getElementById('totalAmount').textContent = total.toFixed(2);
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    
+    // Handle Excel date format (5 digits)
+    if (dateStr.toString().length === 5) {
+        const excelDate = parseInt(dateStr);
+        const baseDate = new Date('1899-12-30');
+        const date = new Date(baseDate.getTime() + excelDate * 24 * 60 * 60 * 1000);
+        return date.toISOString().split('T')[0];
+    }
+    
+    // Handle DD-MM-YYYY format
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+        // Check if it's already in YYYY-MM-DD format
+        if (parts[0].length === 4) {
+            return dateStr;
+        }
+        // Convert from DD-MM-YYYY to YYYY-MM-DD
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    
+    return dateStr;
+}
+
+function showAlert(message, isSuccess) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${isSuccess ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} transition-opacity duration-500 z-50`;
+    alertDiv.textContent = message;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        alertDiv.style.opacity = '0';
+        setTimeout(() => alertDiv.remove(), 500);
+    }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize form with original values
+    document.getElementById('borrower_name').value = originalValues.borrower;
+    document.getElementById('principal_amount').value = originalValues.principal.toFixed(2);
+    document.getElementById('interest_amount').value = originalValues.interest.toFixed(2);
+    document.getElementById('penalty_amount').value = originalValues.penalty.toFixed(2);
+    document.getElementById('notes').value = originalValues.notes;
+    
+    // Initialize date input with the payment date
+    const dateInput = document.getElementById('payment_date');
+    const initialDate = formatDate(originalValues.date);
+    if (initialDate) {
+        dateInput.value = initialDate;
+    }
+    
+    // Calculate initial total
+    calculateTotal();
+});
+
+// Add form submission handler
+document.getElementById('editPaymentForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitButton = this.querySelector('button[type="submit"]');
+    
+    // Ensure borrower hasn't been changed
+    if (formData.get('borrower_name') !== originalValues.borrower) {
+        showAlert('Cannot change the borrower for an existing payment', false);
+        return;
+    }
+    
+    // Validate amounts
+    const principal = parseFloat(formData.get('principal_amount')) || 0;
+    const interest = parseFloat(formData.get('interest_amount')) || 0;
+    const penalty = parseFloat(formData.get('penalty_amount')) || 0;
+    
+    if (principal + interest + penalty <= 0) {
+        showAlert('At least one payment amount must be greater than 0', false);
+        return;
+    }
+    
+    try {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="flex items-center justify-center gap-2"><svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Saving...</span>';
+        
+        const response = await fetch(window.location.href, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showAlert(result.message || 'Payment updated successfully', true);
+            // Wait for the alert to be visible before redirecting
+            setTimeout(() => {
+                window.location.href = "{{ url_for('add_payment') }}";
+            }, 1500);
+        } else {
+            showAlert(result.message || 'Failed to update payment', false);
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<span class="flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Save Changes</span>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('An error occurred while updating the payment', false);
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<span class="flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Save Changes</span>';
+    }
+});
+</script>
+{% endblock %} 

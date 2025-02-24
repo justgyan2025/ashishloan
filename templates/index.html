@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    .gradient-text {
+        background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-card {
+        background: white;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
+        padding: 2rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(59, 130, 246, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 35px rgba(59, 130, 246, 0.15);
+    }
+
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--stat-color-from), var(--stat-color-to));
+    }
+
+    .stats-card.blue {
+        --stat-color-from: #3B82F6;
+        --stat-color-to: #1D4ED8;
+    }
+
+    .stats-card.green {
+        --stat-color-from: #22C55E;
+        --stat-color-to: #16A34A;
+    }
+
+    .stats-card.purple {
+        --stat-color-from: #8B5CF6;
+        --stat-color-to: #6D28D9;
+    }
+
+    .stats-card.indigo {
+        --stat-color-from: #6366F1;
+        --stat-color-to: #4338CA;
+    }
+    
+    .chart-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(59, 130, 246, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .chart-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3B82F6, #1D4ED8);
+    }
+
+    .chart-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 35px rgba(59, 130, 246, 0.15);
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .chart-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        color: #3B82F6;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        .chart-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-container {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-wrapper {
+            height: 250px;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .chart-wrapper {
+            height: 200px;
+        }
+
+        .chart-container {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    }
+
+    .legend-container {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #4B5563;
+    }
+
+    .legend-dot {
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: 50%;
+    }
+
+    .stat-icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        opacity: 0.1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Stats Overview -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-6 gradient-text">Dashboard Overview</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Total Borrowers -->
+            <div class="stats-card blue" data-aos="fade-up" data-aos-delay="100">
+                <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-600">Total Borrowers</h3>
+                <p class="text-3xl font-bold text-blue-600 mt-2">{{ total_borrowers }}</p>
+            </div>
+            <!-- Active Loans -->
+            <div class="stats-card green" data-aos="fade-up" data-aos-delay="200">
+                <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-600">Active Loans</h3>
+                <p class="text-3xl font-bold text-green-600 mt-2">{{ active_loans_count }}</p>
+            </div>
+            <!-- Total Loan Amount -->
+            <div class="stats-card purple" data-aos="fade-up" data-aos-delay="300">
+                <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-600">Total Loan Amount</h3>
+                <p class="text-3xl font-bold text-purple-600 mt-2">₹{{ "{:,.2f}".format(total_loan_amount) }}</p>
+            </div>
+            <!-- Total Amount Paid -->
+            <div class="stats-card indigo" data-aos="fade-up" data-aos-delay="400">
+                <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-600">Total Amount Paid</h3>
+                <p class="text-3xl font-bold text-indigo-600 mt-2">₹{{ "{:,.2f}".format(total_amount_paid) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="chart-grid">
+        <!-- Loan Status Distribution -->
+        <div class="chart-container" data-aos="fade-up">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <svg class="chart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                    </svg>
+                    Loan Status Distribution
+                </h3>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="loanStatusChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Monthly Payment Trends -->
+        <div class="chart-container" data-aos="fade-up">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <svg class="chart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                    Monthly Payment Trends
+                </h3>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="paymentTrendsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+
+    // Chart.js Global Configuration
+    Chart.defaults.font.family = "'Poppins', sans-serif";
+    Chart.defaults.font.size = 12;
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    Chart.defaults.plugins.tooltip.titleColor = '#1f2937';
+    Chart.defaults.plugins.tooltip.bodyColor = '#1f2937';
+    Chart.defaults.plugins.tooltip.borderColor = '#e5e7eb';
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.plugins.tooltip.displayColors = true;
+
+    // Prepare data for charts
+    const loans = {{ loans|tojson|safe }};
+    const payments = {{ payments|tojson|safe }};
+    
+    // Loan Status Distribution Chart
+    const statusCounts = {
+        'Active': loans.filter(loan => loan[6] === 'Active').length,
+        'Completed': loans.filter(loan => loan[6] === 'Completed').length,
+        'Default': loans.filter(loan => loan[6] === 'Default').length,
+        'Pending': loans.filter(loan => loan[6] === 'Pending').length
+    };
+
+    new Chart(document.getElementById('loanStatusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(statusCounts),
+            datasets: [{
+                data: Object.values(statusCounts),
+                backgroundColor: [
+                    'rgba(34, 197, 94, 0.8)',  // Active - Green
+                    'rgba(107, 114, 128, 0.8)', // Completed - Gray
+                    'rgba(239, 68, 68, 0.8)',   // Default - Red
+                    'rgba(234, 179, 8, 0.8)'    // Pending - Yellow
+                ],
+                borderColor: [
+                    'rgb(22, 163, 74)',
+                    'rgb(75, 85, 99)',
+                    'rgb(220, 38, 38)',
+                    'rgb(202, 138, 4)'
+                ],
+                borderWidth: 2,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+
+    // Monthly Payment Trends Chart
+    function processPayments(payments) {
+        const monthlyTotals = {};
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        payments.forEach(payment => {
+            if (!payment[3]) return; // Skip if no date
+            
+            let date;
+            const dateStr = payment[3].toString();
+            
+            try {
+                if (dateStr.includes('-')) {
+                    // Handle YYYY-MM-DD format
+                    date = new Date(dateStr);
+                } else if (!isNaN(dateStr) && dateStr.length === 5) {
+                    // Handle Excel date format
+                    const excelDate = parseInt(dateStr);
+                    const baseDate = new Date('1899-12-30');
+                    date = new Date(baseDate.getTime() + excelDate * 24 * 60 * 60 * 1000);
+                } else {
+                    // Try parsing as regular date string
+                    date = new Date(dateStr);
+                }
+                
+                if (isNaN(date.getTime())) return; // Skip if invalid date
+                
+                const monthYear = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+                const amount = parseFloat(payment[2]) || 0;
+                
+                monthlyTotals[monthYear] = (monthlyTotals[monthYear] || 0) + amount;
+            } catch (e) {
+                console.error('Error processing payment date:', e);
+            }
+        });
+        
+        return monthlyTotals;
+    }
+
+    const monthlyTotals = processPayments(payments);
+    
+    // Get the last 6 months of data
+    const sortedMonths = Object.keys(monthlyTotals)
+        .sort((a, b) => {
+            const [aMonth, aYear] = a.split(' ');
+            const [bMonth, bYear] = b.split(' ');
+            const monthA = new Date(`${aMonth} 1, ${aYear}`);
+            const monthB = new Date(`${bMonth} 1, ${bYear}`);
+            return monthA - monthB;
+        })
+        .slice(-6);
+    
+    const monthlyData = {
+        labels: sortedMonths,
+        datasets: [{
+            label: 'Total Payments',
+            data: sortedMonths.map(month => monthlyTotals[month].toFixed(2)),
+            fill: {
+                target: 'origin',
+                above: 'rgba(59, 130, 246, 0.1)'
+            },
+            borderColor: '#3B82F6',
+            borderWidth: 3,
+            tension: 0.4,
+            pointBackgroundColor: 'white',
+            pointBorderColor: '#3B82F6',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+        }]
+    };
+
+    new Chart(document.getElementById('paymentTrendsChart'), {
+        type: 'line',
+        data: monthlyData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString();
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '₹' + parseFloat(context.raw).toLocaleString();
+                        }
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

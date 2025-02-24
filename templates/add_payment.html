@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto p-4">
+    <!-- Add Payment Form -->
+    <div class="bg-white rounded-2xl shadow-[0_0_25px_rgba(59,130,246,0.2)] overflow-hidden mb-8 border border-blue-100">
+        <div class="px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 border-b">
+            <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Add New Payment
+            </h3>
+        </div>
+        <div class="p-6 bg-gradient-to-b from-white to-blue-50">
+            <form method="POST" class="space-y-6" id="paymentForm">
+                <!-- Borrower Selection -->
+                <div class="group">
+                    <label for="borrower_name" class="block text-sm font-semibold text-blue-700 mb-2">Borrower</label>
+                    <select id="borrower_name" name="borrower_name" required
+                            class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl px-4 py-3 
+                                   focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                   hover:border-blue-200">
+                        <option value="">Select Borrower</option>
+                        {% for borrower in borrowers %}
+                        <option value="{{ borrower[0] }}" class="py-2">{{ borrower[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Amount Fields -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="group">
+                        <label for="principal_amount" class="block text-sm font-semibold text-blue-700 mb-2">Principal (₹)</label>
+                        <div class="relative">
+                            <input type="number" step="0.01" id="principal_amount" name="principal_amount" value="0"
+                                   class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl px-4 py-3 
+                                          focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                          hover:border-blue-200">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-blue-400">₹</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label for="interest_amount" class="block text-sm font-semibold text-blue-700 mb-2">Interest (₹)</label>
+                        <div class="relative">
+                            <input type="number" step="0.01" id="interest_amount" name="interest_amount" value="0"
+                                   class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl px-4 py-3 
+                                          focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                          hover:border-blue-200">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-green-400">₹</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label for="penalty_amount" class="block text-sm font-semibold text-blue-700 mb-2">Penalty (₹)</label>
+                        <div class="relative">
+                            <input type="number" step="0.01" id="penalty_amount" name="penalty_amount" value="0"
+                                   class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl px-4 py-3 
+                                          focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                          hover:border-blue-200">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-red-400">₹</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date Field -->
+                <div class="group">
+                    <label for="payment_date" class="block text-sm font-semibold text-blue-700 mb-2">Payment Date</label>
+                    <div class="relative">
+                        <input type="date" id="payment_date" name="payment_date" required
+                               class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl pl-10 pr-4 py-3 
+                                      focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                      hover:border-blue-200
+                                      [&::-webkit-calendar-picker-indicator]:bg-transparent
+                                      [&::-webkit-calendar-picker-indicator]:hover:cursor-pointer
+                                      [&::-webkit-calendar-picker-indicator]:px-2">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Field -->
+                <div class="group">
+                    <label for="notes" class="block text-sm font-semibold text-blue-700 mb-2">Notes</label>
+                    <textarea id="notes" name="notes" rows="3"
+                            class="w-full bg-white text-gray-700 border-2 border-blue-100 rounded-xl px-4 py-3 
+                                   focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all duration-200
+                                   hover:border-blue-200"></textarea>
+                </div>
+
+                <!-- Total Payment Preview -->
+                <div class="p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200 
+                            shadow-lg transform hover:scale-[1.02] transition-all duration-300">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-semibold text-blue-700">Total Payment:</span>
+                        <span class="text-3xl font-bold text-blue-600 payment-glow">₹<span id="totalAmount">0.00</span></span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-8">
+                    <button type="submit"
+                            class="w-full py-4 px-6 rounded-xl text-base font-semibold text-white 
+                                   bg-gradient-to-r from-blue-500 to-blue-600 
+                                   hover:from-blue-600 hover:to-blue-700
+                                   focus:outline-none focus:ring-4 focus:ring-blue-100 
+                                   transform transition-all duration-200 hover:scale-[1.02] 
+                                   shadow-[0_10px_20px_rgba(59,130,246,0.2)]
+                                   hover:shadow-[0_15px_30px_rgba(59,130,246,0.3)]">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                            Add Payment
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment History Section -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+        <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+            <h3 class="text-2xl font-bold text-gray-700 flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Recent Payments
+            </h3>
+        </div>
+        <div class="p-6">
+            {% if payments %}
+            <!-- Desktop Table View -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Borrower</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-blue-500 uppercase tracking-wider">Principal</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-green-500 uppercase tracking-wider">Interest</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-red-500 uppercase tracking-wider">Penalty</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Notes</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for payment in payments %}
+                        <tr class="hover:bg-blue-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ payment[1] }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if payment[3] %}
+                                    {% if payment[3]|string|length == 5 %}
+                                        {% set excel_date = payment[3]|int %}
+                                        {% set base_date = '1899-12-30' %}
+                                        {{ (base_date|string|to_datetime + timedelta(days=excel_date))|strftime('%d-%m-%Y') }}
+                                    {% else %}
+                                        {% set date_parts = payment[3].split('-') %}
+                                        {% if date_parts|length == 3 %}
+                                            {{ date_parts[2] }}-{{ date_parts[1] }}-{{ date_parts[0] }}
+                                        {% else %}
+                                            {{ payment[3] }}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-500">
+                                ₹{{ "{:,.2f}".format(payment[4]|float) if payment[4] and payment[4] != '0.00' else '0.00' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-500">
+                                ₹{{ "{:,.2f}".format(payment[5]|float) if payment[5] and payment[5] != '0.00' else '0.00' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-500">
+                                ₹{{ "{:,.2f}".format(payment[6]|float) if payment[6] and payment[6] != '0.00' else '0.00' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
+                                ₹{{ "{:,.2f}".format(payment[2]|float) if payment[2] and payment[2] != '0.00' else '0.00' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ payment[7]|default('', true) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div class="flex gap-2">
+                                    <a href="{{ url_for('edit_payment', payment_id=payment[0]) }}" 
+                                       class="text-blue-600 hover:text-blue-800 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                    </a>
+                                    <a href="#" onclick="confirmDelete('{{ url_for('delete_payment', payment_id=payment[0]) }}')"
+                                       class="text-red-600 hover:text-red-800 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="space-y-4 md:hidden">
+                {% for payment in payments %}
+                <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="text-gray-800 font-semibold">{{ payment[1] }}</div>
+                        <div class="text-sm text-gray-500">
+                            {% if payment[3] %}
+                                {% if payment[3]|string|length == 5 %}
+                                    {% set excel_date = payment[3]|int %}
+                                    {% set base_date = '1899-12-30' %}
+                                    {{ (base_date|string|to_datetime + timedelta(days=excel_date))|strftime('%d-%m-%Y') }}
+                                {% else %}
+                                    {% set date_parts = payment[3].split('-') %}
+                                    {% if date_parts|length == 3 %}
+                                        {{ date_parts[2] }}-{{ date_parts[1] }}-{{ date_parts[0] }}
+                                    {% else %}
+                                        {{ payment[3] }}
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div class="text-blue-600">Principal: ₹{{ "{:,.2f}".format(payment[4]|float) }}</div>
+                        <div class="text-green-600">Interest: ₹{{ "{:,.2f}".format(payment[5]|float) }}</div>
+                        <div class="text-red-600">Penalty: ₹{{ "{:,.2f}".format(payment[6]|float) }}</div>
+                        <div class="text-gray-800 font-semibold">Total: ₹{{ "{:,.2f}".format(payment[2]|float) }}</div>
+                    </div>
+                    {% if payment[7] %}
+                    <div class="mt-3 text-sm text-gray-600">
+                        Notes: {{ payment[7] }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <div class="text-gray-500">No payment history found.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.payment-glow {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Date picker styles */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background-image: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    cursor: pointer;
+    opacity: 0;
+}
+</style>
+
+<script>
+const amountInputs = ['principal_amount', 'interest_amount', 'penalty_amount'];
+
+amountInputs.forEach(id => {
+    document.getElementById(id).addEventListener('input', calculateTotal);
+});
+
+function calculateTotal() {
+    const total = amountInputs.reduce((sum, id) => {
+        return sum + (parseFloat(document.getElementById(id).value) || 0);
+    }, 0);
+    document.getElementById('totalAmount').textContent = total.toFixed(2);
+}
+
+// Update the date input initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize date input with today's date
+    const dateInput = document.getElementById('payment_date');
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    dateInput.value = formattedDate;
+    
+    // Add event listener to format the displayed date
+    dateInput.addEventListener('change', function(e) {
+        const date = new Date(e.target.value);
+        if (!isNaN(date.getTime())) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const formattedDate = `${year}-${month}-${day}`;
+            e.target.value = formattedDate;
+        }
+    });
+});
+
+// Add form submission handler
+document.getElementById('paymentForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitButton = this.querySelector('button[type="submit"]');
+    
+    try {
+        submitButton.disabled = true;
+        submitButton.innerHTML = 'Submitting...';
+        
+        const response = await fetch("{{ url_for('add_payment') }}", {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Payment added successfully');
+            window.location.reload();
+        } else {
+            alert(result.message || 'Failed to add payment');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the payment');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Add Payment';
+    }
+});
+
+function confirmDelete(deleteUrl) {
+    if (confirm('Are you sure you want to delete this payment?')) {
+        window.location.href = deleteUrl;
+    }
+}
+</script>
+{% endblock %} 

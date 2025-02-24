@@ -1,0 +1,602 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    .gradient-text {
+        background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .form-card {
+        background: linear-gradient(to right, #2563eb, #1d4ed8);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .form-header {
+        padding: 2rem;
+        color: white;
+    }
+    
+    .form-content {
+        background-color: white;
+        padding: 2rem;
+        border-top-left-radius: 1.5rem;
+        border-top-right-radius: 1.5rem;
+        margin-top: -1rem;
+    }
+    
+    .input-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .input-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .input-field {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    
+    .input-field:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .submit-button {
+        width: 100%;
+        background: linear-gradient(to right, #2563eb, #1d4ed8);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        font-weight: 500;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.2s ease;
+    }
+    
+    .submit-button:hover {
+        background: linear-gradient(to right, #1d4ed8, #1e40af);
+        transform: scale(1.02);
+    }
+    
+    .loans-section {
+        background-color: white;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid #f3f4f6;
+    }
+    
+    .section-header {
+        padding: 1rem 1.5rem;
+        background: linear-gradient(to right, #f9fafb, #f3f4f6);
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .table-view-toggle {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .toggle-button {
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        background-color: white;
+        border: 1px solid rgba(59, 130, 246, 0.1);
+    }
+    
+    .toggle-button.active {
+        background-color: #2563eb;
+        color: white;
+        border-color: transparent;
+    }
+    
+    .toggle-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .status-badge.active {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+    
+    .status-badge.pending {
+        background-color: #fef9c3;
+        color: #854d0e;
+    }
+    
+    .status-badge.default {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .status-badge.completed {
+        background-color: #f3f4f6;
+        color: #1f2937;
+    }
+    
+    .loan-card {
+        background-color: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        border: 1px solid rgba(59, 130, 246, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .loan-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15);
+    }
+    
+    @media (max-width: 768px) {
+        .table-view {
+            display: none;
+        }
+        
+        .card-view {
+            display: block;
+        }
+        
+        .form-header {
+            padding: 1.5rem;
+        }
+        
+        .form-content {
+            padding: 1.5rem;
+        }
+    }
+    
+    @media (min-width: 769px) {
+        .table-view {
+            display: block;
+        }
+        
+        .card-view {
+            display: none;
+        }
+    }
+    
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Add Loan Form -->
+    <div class="form-card mb-8 animate-float">
+        <div class="form-header">
+            <h2 class="text-3xl font-bold flex items-center gap-3">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Add New Loan
+            </h2>
+            <p class="text-blue-100 mt-2">Create a new loan with detailed information</p>
+        </div>
+        <div class="form-content">
+            <form action="{{ url_for('add_loan') }}" method="post" class="space-y-6">
+                <!-- Borrower Selection -->
+                <div class="input-group">
+                    <label class="input-label" for="borrower_name">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            Borrower
+                        </div>
+                    </label>
+                    <select id="borrower_name" name="borrower_name" required class="input-field">
+                        <option value="">Select Borrower</option>
+                        {% for borrower in borrowers %}
+                        <option value="{{ borrower[0] }}">{{ borrower[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Amount Field -->
+                    <div class="input-group">
+                        <label class="input-label" for="amount">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Loan Amount (₹)
+                            </div>
+                        </label>
+                        <div class="relative">
+                            <input type="number" step="0.01" id="amount" name="amount" required
+                                   class="input-field pl-8" placeholder="0.00">
+                            <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                <span class="text-blue-600">₹</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interest Rate Field -->
+                    <div class="input-group">
+                        <label class="input-label" for="interest_rate">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                                Interest Rate (%)
+                            </div>
+                        </label>
+                        <div class="relative">
+                            <input type="number" step="0.01" id="interest_rate" name="interest_rate" required
+                                   class="input-field pr-8" placeholder="0.00">
+                            <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                <span class="text-blue-600">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Tenure Field -->
+                    <div class="input-group">
+                        <label class="input-label" for="tenure">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Tenure (Months)
+                            </div>
+                        </label>
+                        <input type="number" id="tenure" name="tenure" required min="1"
+                               class="input-field" placeholder="Enter tenure in months">
+                    </div>
+
+                    <!-- Status Field -->
+                    <div class="input-group">
+                        <label class="input-label" for="status">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Loan Status
+                            </div>
+                        </label>
+                        <select id="status" name="status" required class="input-field">
+                            <option value="Active">Active</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Default">Default</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+
+                    <!-- Start Date Field -->
+                    <div class="input-group">
+                        <label class="input-label" for="start_date">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Start Date
+                            </div>
+                        </label>
+                        <input type="date" id="start_date" name="start_date" required class="input-field">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-button">
+                    <span class="flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Add Loan
+                    </span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- All Loans Section -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+        <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-gray-700 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    All Loans
+                </h3>
+                <!-- View Toggle Buttons -->
+                <div class="table-view-toggle">
+                    <button onclick="toggleView('table')" class="toggle-button active" id="tableViewBtn">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M3 18h18M3 6h18"/>
+                        </svg>
+                        Table
+                    </button>
+                    <button onclick="toggleView('card')" class="toggle-button" id="cardViewBtn">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                        Cards
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="p-6">
+            {% if loans %}
+            <!-- Table View -->
+            <div class="table-view active">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Borrower</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Interest Rate</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Start Date</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tenure</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">EMI</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for loan in loans %}
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <span class="text-blue-600 font-medium">{{ loan[0][0]|upper }}</span>
+                                        </div>
+                                        <span class="ml-3 text-sm text-gray-900">{{ loan[0] }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-medium text-gray-900">₹{{ "{:,.2f}".format(loan[1]|float) }}</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-2.5 w-2.5 rounded-full bg-blue-600 mr-2"></div>
+                                        <span class="text-sm text-gray-500">{{ loan[2] }}%</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm text-gray-500">{{ loan[3] }}</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm text-gray-500">{{ loan[4] }} months</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% set monthly_principal = loan[1]|float / loan[4]|float %}
+                                    {% set monthly_interest = (loan[1]|float * (loan[2]|float / 100)) / 12 %}
+                                    {% set monthly_emi = monthly_principal + monthly_interest %}
+                                    <div class="text-sm">
+                                        <div class="font-medium text-gray-900">₹{{ "{:,.2f}".format(monthly_emi) }}</div>
+                                        <div class="text-xs text-gray-500 mt-1">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                <span>Principal: ₹{{ "{:,.2f}".format(monthly_principal) }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                                <span>Interest: ₹{{ "{:,.2f}".format(monthly_interest) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="status-badge {{ loan[6]|lower }}">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 8 8">
+                                            <circle cx="4" cy="4" r="3"/>
+                                        </svg>
+                                        {{ loan[6] }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('edit_loan', loan_id=loop.index0) }}" 
+                                           class="action-button edit-button">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </a>
+                                        <button onclick="confirmDelete('{{ url_for('delete_loan', loan_id=loop.index0) }}')"
+                                                class="action-button delete-button">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Card View -->
+            <div class="card-view">
+                {% for loan in loans %}
+                <div class="loan-card">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <span class="text-blue-600 font-medium">{{ loan[0][0]|upper }}</span>
+                                </div>
+                                <span class="text-lg font-medium text-gray-900">{{ loan[0] }}</span>
+                            </div>
+                            <div class="text-sm text-gray-500">Started: {{ loan[3] }}</div>
+                        </div>
+                        <span class="status-badge {{ loan[6]|lower }}">{{ loan[6] }}</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <div class="text-sm text-gray-500">Amount</div>
+                            <div class="text-lg font-medium text-gray-900">₹{{ "{:,.2f}".format(loan[1]|float) }}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500">Interest Rate</div>
+                            <div class="text-lg font-medium text-gray-900">{{ loan[2] }}%</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500">Tenure</div>
+                            <div class="text-lg font-medium text-gray-900">{{ loan[4] }} months</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500">EMI</div>
+                            {% set monthly_principal = loan[1]|float / loan[4]|float %}
+                            {% set monthly_interest = (loan[1]|float * (loan[2]|float / 100)) / 12 %}
+                            {% set monthly_emi = monthly_principal + monthly_interest %}
+                            <div class="text-lg font-medium text-gray-900">₹{{ "{:,.2f}".format(monthly_emi) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 mt-4">
+                        <a href="{{ url_for('edit_loan', loan_id=loop.index0) }}" 
+                           class="action-button edit-button flex-1 justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            Edit
+                        </a>
+                        <button onclick="confirmDelete('{{ url_for('delete_loan', loan_id=loop.index0) }}')"
+                                class="action-button delete-button flex-1 justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <div class="text-gray-500">No loans found.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize start date with today's date
+    const dateInput = document.getElementById('start_date');
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    dateInput.value = formattedDate;
+    
+    // Add event listener to format the displayed date
+    dateInput.addEventListener('change', function(e) {
+        const date = new Date(e.target.value);
+        if (!isNaN(date.getTime())) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const formattedDate = `${year}-${month}-${day}`;
+            e.target.value = formattedDate;
+        }
+    });
+});
+
+function confirmDelete(deleteUrl) {
+    if (confirm('Are you sure you want to delete this loan?')) {
+        window.location.href = deleteUrl;
+    }
+}
+
+function toggleView(view) {
+    const tableView = document.querySelector('.table-view');
+    const cardView = document.querySelector('.card-view');
+    const tableViewBtn = document.getElementById('tableViewBtn');
+    const cardViewBtn = document.getElementById('cardViewBtn');
+
+    if (view === 'table') {
+        tableView.classList.add('active');
+        cardView.classList.remove('active');
+        tableViewBtn.classList.add('active');
+        cardViewBtn.classList.remove('active');
+    } else {
+        cardView.classList.add('active');
+        tableView.classList.remove('active');
+        cardViewBtn.classList.add('active');
+        tableViewBtn.classList.remove('active');
+    }
+}
+
+// Initialize view based on screen size
+function initializeView() {
+    if (window.innerWidth < 768) {
+        toggleView('card');
+    } else {
+        toggleView('table');
+    }
+}
+
+// Call initializeView on page load and window resize
+document.addEventListener('DOMContentLoaded', initializeView);
+window.addEventListener('resize', initializeView);
+</script>
+{% endblock %} 
